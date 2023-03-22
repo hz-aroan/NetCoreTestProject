@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.SQL", "Infrastructure.SQL\Infrastructure.SQL.csproj", "{E933577A-FB5D-4247-AA1D-6B6FCC1BFEBE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIB.Domain", "LIB.Domain\LIB.Domain.csproj", "{0DB75EBA-379A-4BA6-B198-4CF98A44FE54}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Site", "Web.Site\Web.Site.csproj", "{310E3FBE-CC25-434B-AEC8-826375E53B33}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{B9DF88D3-BC3A-409A-A864-DE9EA934E5E9}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL-Migrations", "SQL-Migrations", "{503F5272-C76E-4461-A8DF-BA2BF016C792}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\SQL-Migration\MAIN-01-001-001-001-initialize.sql = Deployment\SQL-Migration\MAIN-01-001-001-001-initialize.sql
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{1E3E5DEA-870A-4454-A0B0-8DB5E9790094}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.API", "Web.API\Web.API.csproj", "{85722D4D-E35B-4AA4-8577-7EB3F4AE26FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E933577A-FB5D-4247-AA1D-6B6FCC1BFEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E933577A-FB5D-4247-AA1D-6B6FCC1BFEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E933577A-FB5D-4247-AA1D-6B6FCC1BFEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E933577A-FB5D-4247-AA1D-6B6FCC1BFEBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DB75EBA-379A-4BA6-B198-4CF98A44FE54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DB75EBA-379A-4BA6-B198-4CF98A44FE54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DB75EBA-379A-4BA6-B198-4CF98A44FE54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DB75EBA-379A-4BA6-B198-4CF98A44FE54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{310E3FBE-CC25-434B-AEC8-826375E53B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{310E3FBE-CC25-434B-AEC8-826375E53B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{310E3FBE-CC25-434B-AEC8-826375E53B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{310E3FBE-CC25-434B-AEC8-826375E53B33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E3E5DEA-870A-4454-A0B0-8DB5E9790094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E3E5DEA-870A-4454-A0B0-8DB5E9790094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E3E5DEA-870A-4454-A0B0-8DB5E9790094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E3E5DEA-870A-4454-A0B0-8DB5E9790094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85722D4D-E35B-4AA4-8577-7EB3F4AE26FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85722D4D-E35B-4AA4-8577-7EB3F4AE26FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85722D4D-E35B-4AA4-8577-7EB3F4AE26FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85722D4D-E35B-4AA4-8577-7EB3F4AE26FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{503F5272-C76E-4461-A8DF-BA2BF016C792} = {B9DF88D3-BC3A-409A-A864-DE9EA934E5E9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1BA5AFD1-C6AC-4ECF-BE50-456C024CBC5E}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,51 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Web.Site.Areas.Backoffice.Event.Models.AddEventViewModel
+
+<div class="modal fade" id="addNewEventModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-area="Backoffice" asp-controller="Event" asp-action="DoAddEvent" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add new event</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-1">
+                        <div class="col-2">
+                            <label>Name:</label>
+                        </div>
+                        <div class="col-10">
+                            <input asp-for="EventName" aria-autocomplete="none" autocomplete="off" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-2">
+                            <label>Description:</label>
+                        </div>
+                        <div class="col-10">
+                            <input asp-for="Description" aria-autocomplete="none" autocomplete="off" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-2">
+                            <label>Fee</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" asp-for="FeeAmount" class="form-control"/>
+                        </div>
+                        <div class="col-4">
+                            <select asp-for="Currency" asp-items="@Model.Currencies" class="form-control"></select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HexaIO TEST App</title>
+    <link type="text/css" rel="stylesheet" href="~/css/theme.min.css" />
+    <link type="text/css" rel="stylesheet" href="~/lib/font-awesome/css/all.min.css">
+    <link type="text/css" rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <noscript><div>Javascript must be enabled!</div></noscript>
+    <partial name="_No_IE_Supported" />
+    <partial name="_Header_NavBar" />
+    <div class="container-fluid" id="MainDiv">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <partial name="_Footer" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/popper.js/umd/popper.min.js"></script>
+    <script src="~/lib/font-awesome/js/fontawesome.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+@* /*<script src="~/lib/jquery/dist/jquery.min.js"></script>*/ *@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/font-awesome/js/fontawesome.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

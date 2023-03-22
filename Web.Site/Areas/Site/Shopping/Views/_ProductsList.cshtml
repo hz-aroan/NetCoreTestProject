@@ -1,0 +1,41 @@
+﻿@model Web.Site.Areas.Site.Shopping.Models.ProductListViewModel
+
+
+@if (Model.Products.Any())
+{
+    <table class="table table-sm table-striped table-borderless">
+        <thead>
+        <tr class="bg-secondary">
+            <th>Product name</th>
+            <th>Fee</th>
+            <th class="text-right">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Fee</td>
+                <td class="text-right">
+                    <a href="@Url.Action("AddProduct", "Shopping", new { Area = "Site", productId = item.ProductId, qty = 1 })" class="btn btn-outline-primary btn-sm" title="Add to card">
+                        <i class="fa-solid fa-plus"></i>
+                    </a>
+                    <a href="@Url.Action("AddProduct", "Shopping", new { Area = "Site", productId = item.ProductId, qty = -1 })" class="btn btn-outline-primary btn-sm" title="Remove from card">
+                        <i class="fa-solid fa-minus"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="info bg-white p-4 m-4">
+        <p>
+            <i class="fa-solid fa-face-sad-tear"></i>
+            It seems no products are available to this event.
+        </p>
+    </div>
+}

@@ -1,0 +1,39 @@
+﻿@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+@model Web.Site.Areas.Backoffice.Event.Models.EventSelectionViewModel
+
+<div class="d-flex mb-4">
+    <h4 class="flex-fill">Events management back-office site</h4>
+    <span>
+        <a href="#" type="button" class="btn btn-outline-primary" data-url="@Url.Action("AddEvent", "Event", new { Area = "Backoffice" })" data-click-result="dialog">
+            <i class="fa fa-plus"></i> Add new event
+        </a>
+    </span>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-borderless">
+                <thead>
+                <tr class="bg-secondary">
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Is Available</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Events)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.IsAvailable</td>
+                        <th class="text-right"></th>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

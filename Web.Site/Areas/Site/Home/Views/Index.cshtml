@@ -1,0 +1,36 @@
+﻿@model Web.Site.Areas.Site.Home.Models.EventSelectionViewModel
+
+
+<h4>Select an event to attend</h4>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-borderless">
+                <thead>
+                <tr class="bg-secondary">
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Service fee</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Events)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.Fee</td>
+                        <td class="text-right">
+                            <a href="@Url.Action("SelectEvent", "Shopping", new { Area = "Site", eventId = item.EventId })" class="btn btn-outline-primary btn-sm">
+                                <i class="fa-solid fa-check"></i> Select event
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

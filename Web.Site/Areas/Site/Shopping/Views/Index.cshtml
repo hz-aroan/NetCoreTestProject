@@ -1,0 +1,71 @@
+﻿@model Web.Site.Areas.Site.Shopping.Models.IndexViewModel
+
+
+<div class="row">
+    <div class="col-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Selected event</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@Model.SelectedEvent.Name</h6>
+                <p class="card-text">@Model.SelectedEvent.Description</p>
+            </div>
+        </div>
+        @if (Model.Basket.Products.Any())
+        {
+            <table class="table table-sm table-striped table-borderless">
+                <thead>
+                <tr class="bg-secondary">
+                    <th>Name</th>
+                    <th>Fee</th>
+                    <th>Quantity</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Basket.Products)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Fee</td>
+                        <td>@item.Quantity</td>
+                        <td class="text-right">
+                            <a href="@Url.Action("AddProduct", "Shopping", new { Area = "Site", productId = item.ProductId, qty = +1 })" class="btn btn-outline-primary btn-sm" title="Add to card">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            <a href="@Url.Action("AddProduct", "Shopping", new { Area = "Site", productId = item.ProductId, qty = -1 })" class="btn btn-outline-primary btn-sm" title="Remove from card">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="info bg-white p-4 m-4">
+                <p>
+                    <i class="fa-solid fa-gifts"></i>
+                    To add some products to the event please select from the list to the right!
+                </p>
+                <p class="mt-2">In the meantime the default service fee we is required!</p>
+            </div>
+        }
+        <div class="mt-4">Current total payment:</div>
+        <table class="table table-sm table-striped table-borderless">
+            <tbody>
+            @foreach (var item in Model.Basket.Payments)
+            {
+                <tr>
+                    <td class="text-right">@item.ToString()</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-8" data-ajax-auto-load="@Url.Action("GetProducts", "Shopping", new { Area = "Site" })" data-target="#productsPanel" id="productsPanel">
+        <p>loading ...</p>
+    </div>
+</div>

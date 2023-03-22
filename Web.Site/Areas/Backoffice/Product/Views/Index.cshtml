@@ -1,0 +1,39 @@
+﻿@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+@model Web.Site.Areas.Backoffice.Product.Models.ProductSelectionViewModel
+
+<div class="d-flex mb-4">
+    <h4 class="flex-fill">Products management back-office site</h4>
+    <span>
+        <a href="#" type="button" class="btn btn-outline-primary" data-url="@Url.Action("AddProduct", "Product", new { Area = "Backoffice" })" data-click-result="dialog">
+            <i class="fa fa-plus"></i> Add new product
+        </a>
+    </span>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-borderless">
+                <thead>
+                <tr class="bg-secondary">
+                    <th>Name</th>
+                    <th>Is Available</th>
+                    <th>Fee</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Products)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.IsAvailable</td>
+                        <td>@item.Fee.ToString()</td>
+                        <th class="text-right"></th>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
