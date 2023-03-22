@@ -68,6 +68,20 @@ So safe to execute the tests.
   table to the system and replace the operations using the underlying table instead - if needed
 
 
+Ahh! I have some words on Basket UID (GUID field)! As I told the guid field is not optimal for indexing and
+querying data. I have 2 reasons to use guid now:
+* basket head table: might not will contains millions of records
+* as there is no user table in the system, no authorization, no validation which user owns the basket,
+  and the `int` typed `basketId` field is not a safe choose. When you have a basketId you can easily find out
+  other basketIds, and might add new products to another basket. Using GUID is a little bit safer managing
+  a basket.
+
+Also, as there is no user table - no authorization - so cannot guess which was my own basket for an event before.
+So cannot *continue* to work with my previous basket. A basket is lost on WEB if you choose another event to attend
+(another basket is created). On Rest.API if you saved you basketUid - you can anytime continue the work 
+with the given basket.
+
+
 # Notes
 
 I copied some codes from my projects for this application
