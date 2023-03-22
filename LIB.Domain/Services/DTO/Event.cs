@@ -31,7 +31,7 @@ public class Event
         EventId = p.EventId;
         Name = p.Name;
         Fee = new Fee {
-            Amount = (Double?)p.FeeAmount ?? 0,
+            Amount = (Double)p.FeeAmount,
             CurrencyId = p.FeeCurrency,
             CurrencySign = currencySign
         };

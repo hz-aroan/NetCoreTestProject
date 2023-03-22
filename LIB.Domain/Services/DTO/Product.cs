@@ -27,7 +27,7 @@ public class Product
         IsAvailable = p.IsAvailable;
         Fee = new Fee {
             CurrencyId = p.FeeCurrency,
-            Amount = (Double?)p.FeeAmount ?? 0,
+            Amount = (Double)p.FeeAmount,
             CurrencySign = sign
         };
     }
