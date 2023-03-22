@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
 using Microsoft.EntityFrameworkCore;
@@ -16,26 +18,29 @@ public class GetAllAvailableEventsQry : IQueryRequest<IList<Services.DTO.Event>>
 
 public class GetEventsAvailableQryHandler : IQueryHandler<GetAllAvailableEventsQry, IList<Services.DTO.Event>>
 {
-    private readonly CurrencyHandlingService CurrencyService;
+    private readonly ICurrencyHandlingService CurrencyService;
 
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IEFWrapper EFWrapper;
 
 
 
-    public GetEventsAvailableQryHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetEventsAvailableQryHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
-        CurrencyService = new CurrencyHandlingService();
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
 
 
 
     public IList<Services.DTO.Event> Execute(GetAllAvailableEventsQry queryArg)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
-        var rawEvents = ctx.Events.Where(p => p.IsAvailable)
+        using var ctx = EFWrapper.GetContext();
+        var rawEvents = ctx.Events
+            .IgnoreAutoIncludes()
+            .Where(p => p.IsAvailable)
             .OrderBy(p => p.EventId)
             .AsNoTracking();
+        
         var result = rawEvents.Select(p => new Services.DTO.Event(p, CurrencyService.GetSing(p.FeeCurrency)));
         return result.ToList();
     }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 
 using System.Reflection;
+using LIB.Domain.Contracts;
+using LIB.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,9 @@ var mainConnectionString = builder.Configuration.GetConnectionString("MainDataba
 builder.Services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
 builder.Services.AddScoped<IDispatcher, Dispatcher>();
+builder.Services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
+builder.Services.AddScoped<IEFWrapper, EFWrapper>();
+builder.Services.AddScoped<IBasketHandlingService, BasketHandlingService>();
 CqAutoRegister.BuildCqTypes(builder.Services,typeof(GetAllAvailableEventsQry).Assembly);
 
 builder.Services.Configure<RazorViewEngineOptions>(options =>

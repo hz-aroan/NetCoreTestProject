@@ -3,10 +3,10 @@ using Microsoft.OpenApi.Models;
 using LIB.Domain.Features.Events;
 using LIB.Domain.Services.CQ;
 
-using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using LIB.Domain.Contracts;
+using LIB.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +18,9 @@ var mainConnectionString = builder.Configuration.GetConnectionString("MainDataba
 builder.Services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
 builder.Services.AddScoped<IDispatcher, LIB.Domain.Services.CQ.Dispatcher>();
+builder.Services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
+builder.Services.AddScoped<IEFWrapper, EFWrapper>();
+builder.Services.AddScoped<IBasketHandlingService, BasketHandlingService>();
 CqAutoRegister.BuildCqTypes(builder.Services,typeof(GetAllAvailableEventsQry).Assembly);
 
 builder.Services.AddControllers();

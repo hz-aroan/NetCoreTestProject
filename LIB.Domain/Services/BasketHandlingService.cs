@@ -1,4 +1,6 @@
 ﻿using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Exceptions;
 using LIB.Domain.Services.DTO;
 using Microsoft.EntityFrameworkCore;
@@ -11,27 +13,26 @@ using Event = Infrastructure.SQL.Main.Event;
 
 namespace LIB.Domain.Services;
 
-internal class BasketHandlingService
+public class BasketHandlingService : IBasketHandlingService
 {
-    private readonly CurrencyHandlingService CurrencyService;
-
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly ICurrencyHandlingService CurrencyService;
+    private readonly IEFWrapper EFWrapper;
 
     
 
-    public BasketHandlingService(IDbContextFactory<MainDbContext> dbctxFactory)
+    public BasketHandlingService(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
-        CurrencyService = new CurrencyHandlingService();
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
+        
     }
 
 
 
     public Basket GetBasket(Guid basketUid)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
         var basket = ctx.BasketHeads.Include(p => p.Event)
-            .Include(p => p.BasketItems)
             .Include(p => p.BasketItems)
             .ThenInclude(p => p.Product)
             .FirstOrDefault(p => p.Uid == basketUid);
@@ -40,8 +41,7 @@ internal class BasketHandlingService
 
         var result = new Basket();
         result.BasketId = basketUid;
-        result.Products = basket.BasketItems.Select(CreateShopProduct)
-            .ToList();
+        result.Products = basket.BasketItems.Select(CreateShopProduct).ToList();
         result.Payments = CalculatePayments(result.Products, basket.Event);
 
         return result;
@@ -53,13 +53,13 @@ internal class BasketHandlingService
     {
         var result = Guid.NewGuid();
 
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
         var basket = new BasketHead {
             EventId = eventId,
             Uid = result
         };
         ctx.BasketHeads.Add(basket);
-        ctx.SaveChanges();
+        EFWrapper.SafeFinish(ctx, "Error happened creating the basket!");
 
         return result;
     }
@@ -68,7 +68,7 @@ internal class BasketHandlingService
 
     public void AddProductToBasket(Guid basketUid, Int32 productId, Int32 quantity)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
 
         var basket = ctx.BasketHeads.Include(p => p.Event)
             .Include(p => p.BasketItems)
@@ -76,7 +76,6 @@ internal class BasketHandlingService
             .FirstOrDefault(p => p.Uid == basketUid);
         if (basket == null)
             throw new DomainException($"Basket not found - uid={basketUid}!");
-
 
         var alreadyAddedProduct = basket.BasketItems.FirstOrDefault(p => p.ProductId == productId);
         if (alreadyAddedProduct != null)
@@ -97,15 +96,7 @@ internal class BasketHandlingService
             };
             if (basketItem.Quantity > 0) basket.BasketItems.Add(basketItem);
         }
-
-        try
-        {
-            ctx.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            throw new DomainException("Error happened during modifying your basket!", ex);
-        }
+        EFWrapper.SafeFinish(ctx, "Error happened adding product to your basket!");
     }
 
 
@@ -116,40 +107,66 @@ internal class BasketHandlingService
 
     private IList<Payment> CalculatePayments(IList<ShopProduct> products, Event selectedEvent)
     {
-        var result = new List<Payment>();
-        foreach (var product in products)
-        {
-            var payment = result.FirstOrDefault(p => p.CurrencySign == product.Fee.CurrencySign);
-
-            if (payment == null)
-            {
-                payment = new Payment {
-                    CurrencyId = product.Fee.CurrencyId,
-                    CurrencySign = product.Fee.CurrencySign,
-                    Amount = 0
-                };
-                result.Add(payment);
-            }
-
-            payment.Amount += product.Fee.Amount * product.Quantity;
-
-            if (payment.Amount == 0)
-                result.Remove(payment);
-        }
+        var result = CalcPayments(products);
+        result = CleanUpPayments(result);
 
         if (result.Any() == false)
         {
-            var payment = new Payment {
-                CurrencyId = selectedEvent.FeeCurrency,
-                Amount = (Double?)selectedEvent.FeeAmount ?? 0,
-                CurrencySign = CurrencyService.GetSing(selectedEvent.FeeCurrency)
-            };
-            result.Add(payment);
+            var defaultFee = CalcDefaultFee(selectedEvent);
+            result.Add(defaultFee);
         }
 
         return result;
     }
 
+
+
+    private List<Payment> CalcPayments(IList<ShopProduct> products)
+    {
+        var result = new List<Payment>();
+        foreach (var product in products)
+        {
+            var payment = FindForCurrency(product.Fee, result);
+            payment.Amount += product.Fee.Amount * product.Quantity;
+        }
+        return result;
+    }
+
+
+    private Payment CalcDefaultFee(Event selectedEvent)
+    {
+        var result = new Payment {
+            CurrencyId = selectedEvent.FeeCurrency,
+            Amount = (Double)selectedEvent.FeeAmount,
+            CurrencySign = CurrencyService.GetSing(selectedEvent.FeeCurrency)
+        };
+        return result;
+    }
+
+
+    private List<Payment> CleanUpPayments(List<Payment> payments)
+    {
+        var result = payments.Where(p => p.Amount > 0);
+        return result.ToList();
+    }
+
+
+    private Payment FindForCurrency(Fee fee, List<Payment> payments)
+    {
+        var payment = payments.FirstOrDefault(p => p.CurrencyId == fee.CurrencyId);
+
+        if (payment == null)
+        {
+            payment = new Payment {
+                CurrencyId = fee.CurrencyId,
+                CurrencySign = fee.CurrencySign,
+                Amount = 0
+            };
+            payments.Add(payment);
+        }
+
+        return payment;
+    }
 
 
     private ShopProduct CreateShopProduct(BasketItem item)

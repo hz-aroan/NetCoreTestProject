@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LIB.Domain.Contracts;
 
 namespace LIB.Domain.Features.Baskets;
 
@@ -30,20 +31,18 @@ public class AddProductToBasketCmd : ICommandArg
 
 public class AddProductToBasketCmdHandler : ICommandHandler<AddProductToBasketCmd>
 {
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IBasketHandlingService BasketHandler;
 
 
-
-    public AddProductToBasketCmdHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public AddProductToBasketCmdHandler(IBasketHandlingService basketHandler)
     {
-        DbctxFactory = dbctxFactory;
+        BasketHandler = basketHandler;
     }
 
 
 
     public void Execute(AddProductToBasketCmd queryArg)
     {
-        var service = new BasketHandlingService(DbctxFactory);
-        service.AddProductToBasket(queryArg.BasketUid, queryArg.ProductId, queryArg.Quantity);
+        BasketHandler.AddProductToBasket(queryArg.BasketUid, queryArg.ProductId, queryArg.Quantity);
     }
 }

@@ -1,7 +1,11 @@
 ﻿using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
+
 using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,23 +26,24 @@ public class CreateBasketCmd : IQueryRequest<Guid>
     }
 }
 
+
+
 public class GetNewShoppingCartCmdHandler : IQueryHandler<CreateBasketCmd, Guid>
 {
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IBasketHandlingService BasketHandler;
 
 
 
-    public GetNewShoppingCartCmdHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetNewShoppingCartCmdHandler(IBasketHandlingService basketHandler)
     {
-        DbctxFactory = dbctxFactory;
+        BasketHandler = basketHandler;
     }
 
 
 
     public Guid Execute(CreateBasketCmd queryArg)
     {
-        var service = new BasketHandlingService(DbctxFactory);
-        var result = service.CreateNewBasket(queryArg.EventId);
+        var result = BasketHandler.CreateNewBasket(queryArg.EventId);
         return result;
     }
 }

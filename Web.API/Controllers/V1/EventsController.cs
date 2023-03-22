@@ -36,6 +36,25 @@ public class EventsController : Controller
     }
 
 
+    [HttpPost("CreateEvent")]
+    [SwaggerOperation(
+        Summary = "Creates a new event",
+        Description = "CurrencyId can be 'eur', 'usd', 'huf'",
+        OperationId = "CreateEvent")]
+    [SwaggerResponse(StatusCodes.Status200OK)]
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    
+    public IActionResult CreateEvent(String eventName, String description, Double feeAmount, String currency)
+    {
+        return Safe.Execute(() =>
+        {
+            Dispatcher.Execute(new AddEventCmd(eventName, description, feeAmount, currency, true));
+            return Ok();
+        });
+    }
+
+
+
     [HttpGet("GetAvailableEvents")]
     [SwaggerOperation(
         Summary = "Get all the available events and its descriptions",
@@ -54,38 +73,20 @@ public class EventsController : Controller
 
 
 
-    [HttpPost("CreateBasket")]
+    [HttpPost("AttendToEvent")]
     [SwaggerOperation(
-        Summary = "Attend to an event and creates a new basket for the customer",
+        Summary = "Attend to an event and creates a new basket for the event",
         Description = "Returns GUID of the new basket",
-        OperationId = "CreateBasket")]
+        OperationId = "AttendToEvent")]
     [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
     [SwaggerResponse(StatusCodes.Status400BadRequest)]
     
-    public IActionResult CreateBasket(Int32 eventId)
+    public IActionResult AttendToEvent(Int32 eventId)
     {
         return Safe.Execute(() =>
         {
             var basketUid = Dispatcher.Query(new CreateBasketCmd(eventId));
             return Ok(Json(basketUid));
-        });
-    }
-
-
-
-    [HttpPut("AddProductToBasketCmd")]
-    [SwaggerOperation(
-        Summary = "Add a product to a basket with the given quantity",
-        OperationId = "AddProductToBasketCmd")]
-    [SwaggerResponse(StatusCodes.Status200OK)]
-    [SwaggerResponse(StatusCodes.Status400BadRequest)]
-    
-    public IActionResult AddProductToBasketCmd(Guid basketUid, Int32 productId, Int32 quantity)
-    {
-        return Safe.Execute(() =>
-        {
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productId, quantity));
-            return Ok();
         });
     }
 }

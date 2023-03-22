@@ -1,7 +1,10 @@
 ﻿using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Exceptions;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace LIB.Domain.Features.Products;
@@ -29,41 +32,34 @@ public class AddProductCmd : ICommandArg
 
 public class AddProductCmdHandler : ICommandHandler<AddProductCmd>
 {
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly ICurrencyHandlingService CurrencyService;
+
+    private readonly IEFWrapper EFWrapper;
 
 
 
-    public AddProductCmdHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public AddProductCmdHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
-
 
 
     public void Execute(AddProductCmd cmd)
     {
-        var product = new Product {
+        var product = new Product
+        {
             Name = cmd.ProductName,
             IsAvailable = cmd.IsAvailable,
             FeeAmount = (Decimal)cmd.FeeAmount,
             FeeCurrency = cmd.Currency
         };
 
-        var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
+        var validator = new ProductValidatingService(CurrencyService);
+        validator.ValidateNewOne(product);
 
-        var validator = new ProductValidatingService();
-        validator.ValidateNewOne(product, availableCurrencies);
-
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
         ctx.Products.Add(product);
-
-        try
-        {
-            ctx.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            throw new DomainException("An error happened adding the new product!", ex);
-        }
+        EFWrapper.SafeFinish(ctx, "An error happened adding the new product!");
     }
 }

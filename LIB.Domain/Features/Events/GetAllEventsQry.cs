@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
 using Microsoft.EntityFrameworkCore;
@@ -17,25 +19,26 @@ public class GetAllEventsQry : IQueryRequest<IList<Event>>
 
 public class GetAllEventsQryHandler : IQueryHandler<GetAllEventsQry, IList<Event>>
 {
-    private readonly CurrencyHandlingService CurrencyService;
+    private readonly ICurrencyHandlingService CurrencyService;
 
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IEFWrapper EFWrapper;
 
 
 
-    public GetAllEventsQryHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetAllEventsQryHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
-        CurrencyService = new CurrencyHandlingService();
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
 
 
 
     public IList<Event> Execute(GetAllEventsQry queryArg)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
         var rawEvents = ctx.Events.OrderBy(p => p.EventId)
             .AsNoTracking();
+
         var result = rawEvents.Select(p => new Event(p, CurrencyService.GetSing(p.FeeCurrency)));
         return result.ToList();
     }

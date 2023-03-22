@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LIB.Domain.Exceptions;
 using LIB.Domain.Services;
+using LIB.Domain.Contracts;
 
 namespace LIB.Domain.Features.Baskets;
 
@@ -24,23 +25,22 @@ public class GetBasketQry : IQueryRequest<Basket>
     }
 }
 
+
 public class GetAllProductsOfBasketQryHandler : IQueryHandler<GetBasketQry, Basket>
 {
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IBasketHandlingService BasketHandler;
 
 
-
-    public GetAllProductsOfBasketQryHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetAllProductsOfBasketQryHandler(IBasketHandlingService basketHandler)
     {
-        DbctxFactory = dbctxFactory;
+        BasketHandler = basketHandler;
     }
 
 
 
     public Basket Execute(GetBasketQry queryArg)
     {
-        var service = new BasketHandlingService(DbctxFactory);
-        var result = service.GetBasket(queryArg.BasketUid);
+        var result = BasketHandler.GetBasket(queryArg.BasketUid);
         return result;
     }
 }

@@ -8,7 +8,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.SQL.Main;
+
+using LIB.Domain.Contracts;
 using LIB.Domain.Features.Events;
+using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +39,9 @@ internal class TestHostConfiguration
                 services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
                 services.AddScoped<IDispatcher, Dispatcher>();
+                services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
+                services.AddScoped<IEFWrapper, EFWrapper>();
+                services.AddScoped<IBasketHandlingService, BasketHandlingService>();
                 CqAutoRegister.BuildCqTypes(services,typeof(GetAllAvailableEventsQry).Assembly);
 
                 configureServicesCallback?.Invoke(ctx, services);

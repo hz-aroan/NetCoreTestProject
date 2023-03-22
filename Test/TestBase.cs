@@ -14,6 +14,7 @@ using Infrastructure.SQL.Main;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
+using LIB.Domain.Contracts;
 
 namespace Test;
 
@@ -24,6 +25,8 @@ public class RepoTestBase
     internal IHost? Host;
     internal IDbContextFactory<MainDbContext> DbctxFactory;
 
+    internal ICurrencyHandlingService CurrencyHandlingService;
+
 
     public void Init()
     {
@@ -31,6 +34,7 @@ public class RepoTestBase
         DbctxFactory = Host.Services.GetRequiredService<IDbContextFactory<MainDbContext>>();
         Log = Host.Services.GetService<ILogger<RepoTestBase>>();
         Dispatcher = Host.Services.GetService<IDispatcher>();
+        CurrencyHandlingService = Host.Services.GetService<ICurrencyHandlingService>();
     }
 
 

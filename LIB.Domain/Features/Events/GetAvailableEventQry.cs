@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.SQL.Main;
+using LIB.Domain.Contracts;
 using LIB.Domain.Exceptions;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
@@ -26,23 +27,24 @@ public class GetAvailableEventQry : IQueryRequest<Event>
 
 public class GetAvailableEventQryHandler : IQueryHandler<GetAvailableEventQry, Event>
 {
-    private readonly CurrencyHandlingService CurrencyService;
+    private readonly ICurrencyHandlingService CurrencyService;
 
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IEFWrapper EFWrapper;
 
 
 
-    public GetAvailableEventQryHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetAvailableEventQryHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
-        CurrencyService = new CurrencyHandlingService();
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
 
+    
 
 
     public Event Execute(GetAvailableEventQry queryArg)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
 
         var rawEvent = ctx.Events.FirstOrDefault(p => p.IsAvailable && p.EventId == queryArg.EventId);
         if (rawEvent == null)

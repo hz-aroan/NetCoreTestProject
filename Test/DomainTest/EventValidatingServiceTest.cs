@@ -33,15 +33,14 @@ public class EventValidatingServiceTest : RepoTestBase
         ExceptionExpected(typeof(DomainException), "should not be empty", () =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
                 Name = ""
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 
@@ -53,16 +52,15 @@ public class EventValidatingServiceTest : RepoTestBase
         ExceptionExpected(typeof(DomainException), "should not be negative", () =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
                 Name = "Any name",
                 FeeAmount = -1
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 
@@ -74,7 +72,6 @@ public class EventValidatingServiceTest : RepoTestBase
         ExceptionExpected(typeof(DomainException), "should not be empty", () =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
@@ -82,9 +79,9 @@ public class EventValidatingServiceTest : RepoTestBase
                 FeeAmount = 10,
                 FeeCurrency = ""
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 
@@ -96,7 +93,6 @@ public class EventValidatingServiceTest : RepoTestBase
         ExceptionExpected(typeof(DomainException), "should not be empty", () =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
@@ -104,9 +100,9 @@ public class EventValidatingServiceTest : RepoTestBase
                 FeeAmount = 10,
                 FeeCurrency = null
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 
@@ -117,7 +113,6 @@ public class EventValidatingServiceTest : RepoTestBase
     {
         ExceptionExpected(typeof(DomainException), "currency {STRING} is unknown", () =>
         {
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
@@ -125,9 +120,9 @@ public class EventValidatingServiceTest : RepoTestBase
                 FeeAmount = 10,
                 FeeCurrency = "unknown"
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 
@@ -139,7 +134,6 @@ public class EventValidatingServiceTest : RepoTestBase
         ExceptionExpected(typeof(DomainException), "already exists", () =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent1 = new Event {
@@ -149,13 +143,13 @@ public class EventValidatingServiceTest : RepoTestBase
             ctx.Events.Add(newEvent1);
             ctx.SaveChanges();
 
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
             var newEvent2 = new Event {
                 Name = "A good name",
                 FeeAmount = 5, FeeCurrency = "usd"
             };
-            service.ValidateNewOne(newEvent2, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent2, ctx);
         });
     }
 
@@ -167,7 +161,6 @@ public class EventValidatingServiceTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
             var ctx = DbctxFactory.CreateDbContext();
 
             var newEvent = new Event {
@@ -175,9 +168,9 @@ public class EventValidatingServiceTest : RepoTestBase
                 FeeAmount = 10,
                 FeeCurrency = "usd"
             };
-            var service = new EventValidatingService();
+            var service = new EventValidatingService(CurrencyHandlingService);
 
-            service.ValidateNewOne(newEvent, availableCurrencies, ctx);
+            service.ValidateNewOne(newEvent, ctx);
         });
     }
 }

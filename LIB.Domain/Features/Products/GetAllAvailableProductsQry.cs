@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.SQL.Main;
+using LIB.Domain.Contracts;
 using LIB.Domain.Services;
 using LIB.Domain.Services.CQ;
 using LIB.Domain.Services.DTO;
@@ -17,32 +18,33 @@ public class GetAllAvailableProductsQry : IQueryRequest<IList<Services.DTO.Produ
 
 public class GetAllAvailableProductsQryHandler : IQueryHandler<GetAllAvailableProductsQry, IList<Services.DTO.Product>>
 {
-    private static readonly CurrencyHandlingService CurrencyService = new CurrencyHandlingService();
+    private readonly ICurrencyHandlingService CurrencyService;
 
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IEFWrapper EFWrapper;
 
 
 
-    public GetAllAvailableProductsQryHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public GetAllAvailableProductsQryHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
 
 
 
     public IList<Services.DTO.Product> Execute(GetAllAvailableProductsQry queryArg)
     {
-        using var ctx = DbctxFactory.CreateDbContext();
+        using var ctx = EFWrapper.GetContext();
         var rawEvents = ctx.Products.IgnoreAutoIncludes()
             .Where(p => p.IsAvailable)
             .OrderBy(p => p.Name);
-        var result = rawEvents.Select(p => CreateProduct(p));
+        var result = rawEvents.Select(CreateProduct);
         return result.ToList();
     }
 
 
 
-    private static Services.DTO.Product CreateProduct(Infrastructure.SQL.Main.Product p)
+    private Services.DTO.Product CreateProduct(Infrastructure.SQL.Main.Product p)
     {
         var sign = CurrencyService.GetSing(p.FeeCurrency);
         var result = new Services.DTO.Product(p, sign);

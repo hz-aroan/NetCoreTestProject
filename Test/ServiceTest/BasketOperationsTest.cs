@@ -20,12 +20,36 @@ using Microsoft.VisualBasic.CompilerServices;
 namespace Test.DomainTest;
 
 [TestClass]
-public class BasketDispatcherTest : RepoTestBase
+public class BasketOperationsTest : RepoTestBase
 {
     [TestInitialize]
     public void SetUp()
     {
         Init();
+    }
+
+
+    
+    [TestMethod]
+    public void GetBasket_ZeroEventCostAndEmptyBasket_PaymentEqualsToEventServiceFee()
+    {
+        SuccessExpected(() =>
+        {
+            ClearDatabase();
+            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 0, "eur", true));
+            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
+
+            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
+            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+
+            Assert.IsFalse(basket.Products.Any());
+
+            Assert.AreEqual(1, basket.Payments.Count);
+            var payment = basket.Payments[0];
+            Assert.AreEqual(anEvent.Fee.Amount, payment.Amount);
+            Assert.AreEqual(anEvent.Fee.CurrencyId, payment.CurrencyId);
+            Assert.AreEqual(anEvent.Fee.CurrencySign, payment.CurrencySign);
+        });
     }
 
 

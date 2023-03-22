@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using LIB.Domain.Exceptions;
 using LIB.Domain.Services;
+using LIB.Domain.Contracts;
 
 namespace LIB.Domain.Features.Events;
 
@@ -38,19 +39,22 @@ public class AddEventCmd : ICommandArg
 
 public class AddEventCmdHandler : ICommandHandler<AddEventCmd>
 {
-    private readonly IDbContextFactory<MainDbContext> DbctxFactory;
+    private readonly IEFWrapper EFWrapper;
+    private readonly ICurrencyHandlingService CurrencyService;
 
 
 
-    public AddEventCmdHandler(IDbContextFactory<MainDbContext> dbctxFactory)
+    public AddEventCmdHandler(IEFWrapper efWrapper, ICurrencyHandlingService currencyService)
     {
-        DbctxFactory = dbctxFactory;
+        EFWrapper = efWrapper;
+        CurrencyService = currencyService;
     }
 
 
 
     public void Execute(AddEventCmd cmd)
     {
+        using var ctx = EFWrapper.GetContext();
         var ev = new Event {
             Name = cmd.EventName,
             IsAvailable = cmd.IsAvailable,
@@ -59,20 +63,10 @@ public class AddEventCmdHandler : ICommandHandler<AddEventCmd>
             FeeCurrency = cmd.Currency
         };
 
-        var availableCurrencies = CurrencyHandlingService.AvailableCurrencies;
+        var validator = new EventValidatingService(CurrencyService);
+        validator.ValidateNewOne(ev, ctx);
 
-        using var ctx = DbctxFactory.CreateDbContext();
-        var validator = new EventValidatingService();
-        validator.ValidateNewOne(ev, availableCurrencies, ctx);
         ctx.Events.Add(ev);
-
-        try
-        {
-            ctx.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            throw new DomainException("An error happened adding the new event!", ex);
-        }
+        EFWrapper.SafeFinish(ctx, "An error happened adding the new event!");
     }
 }

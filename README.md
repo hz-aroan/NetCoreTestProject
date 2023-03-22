@@ -15,6 +15,7 @@
 
 * On the upper right corner there is an *Backoffice* menu where one can add new events and new products
 * note: when exception is thrown for some validation reason the default web exception page will displayd (it is not customized yet)
+* / for some reason must double click on the menu to get it work (I'm still thinking what the heck is going on) /
 * add some events and products
 * then go back to *Home* site (left upper menu)
 * select an event to attend (will create a basket)
@@ -25,58 +26,57 @@
 
 
 
-
 # Project Structure
 
 Infrastructure.SQL  where the Entity Framework DB context and Entity definitions are stored
 
-Lib.Domain          where the CQRS commands, queries, and their handlers are coded
+Lib.Domain              where the CQRS commands, queries, and their handlers are coded
 Lib.Domain\Features     the commands and queries
 Lib.Domain\Services     the DTO classes and service implementations
 
-Web.Site            an ASP.NET Core MVC app to do the job
-Web.Site\appsettings.json          edit it when needed (connection string)
-Web.Site\Areas\Backoffice          the backoffice operations
-Web.Site\Areas\Site                the customers (user) operations
+Web.Site                         an ASP.NET Core MVC app to do the job
+Web.Site\appsettings.json        edit it when needed (connection string)
+Web.Site\Areas\Backoffice        the backoffice operations
+Web.Site\Areas\Site              the customers (user) operations
 
-Web.API           a REST API for the system
-Web.API\Controllers\V1\Events     some operations for 'Events' and 'Baskets'
-Web.API\Controllers\V1\Products   some operations for 'Products'
-
-
-Test              Unit Tests project
-Test\appsettings.json          edit it when needed (connection string)
-Test\TestDB\HexaIOTest.mdf     the local .mdf file to do the test
-Test\Domaintest                some tests against the domain services directly
-Test\ServiceTest               some tests using the dispatcher commands and queries (using the .mdf)
+Web.API							 a REST API for the system
+Web.API\Controllers\V1\Events    some operations for 'Events' and creates a basket
+Web.API\Controllers\V1\Basket    some operations for 'Baskets'
+Web.API\Controllers\V1\Products  some operations for 'Products'
 
 
+Test						     Unit Tests project
+Test\appsettings.json            edit it when needed (connection string)
+Test\TestDB\HexaIOTest.mdf       the local .mdf file to do the test
+Test\Domaintest                  some tests against the domain services directly
+Test\ServiceTest                 some tests using the dispatcher commands and queries (using the .mdf)
+
+Note: the test uses a local .mdf file to execute the DB operations. It attaches its own .mdf file.
+So safe to execute the tests.
 
 
+# Notes
+
+* in the `LIB.Domain\Features\Baskets` commands and queries demonstrates how a domain service can be used 
+  behind the walls - all operations redirected to the service itself.
+* as the `BasketHandlingService` grows, it can be divided into smaller parts of course
+* in the `LIB.Domain\Features\Products` I demonstrate how to handle the commands and queries *in place*, 
+  without using a domain service. Only a validator service I wrote as later there can be an `ProductUpdateCmd`
+  so the re-use of the same validations rules I'm excepting
+* similar to this the `LIB.Domain\Features\Events` I created
+* the Currency service is based on an 'in-memory' list of available currencies. It is easy to add a currency
+  table to the system and replace the operations using the underlying table instead - if needed
 
 
-# NetCoreTestProject - the problem
+# Notes
 
-Given a small online store where a user can buy products for events. An event can have many
-products. Given an event, the user can buy any number of products in the store. When buying a
-product, a service fee is to be added to the total. Service fees can be configured on both event
-and product level. When no override is present for a product, the event fee applies.
+I copied some codes from my projects for this application
+* the CQRS is developed by me (based on MediatR package) - found in `LIB.Domain\Services\CQ`
+* some ajax support added to the Web.Site project to enable Modal dialog loading on-the-fly
+  and lazyl loading of products list
+* added a poorly themed Bootstrap4
+* all of them was totally written by me before, just added to this project in a hurry as I think
+  it is not the main point for now
 
-Constraints:
-- Events and products should at least have a "name"; property.
-- A service fee consists of a currency and an amount
-- For simplicity, you can assume all products cost €10.
 
-Tasks:
-Design a small system that expresses these events, products and service fees in a database.
-Please ensure all the required files or resources with any setup instructions outside of the main
-project folder are sent to us as well.
-
-Then, write a C# application that calculates the total service fee based on an event and a
-selection (basket) of products and quantities. A basic page with a form or an API allowing the
-requirements to be fulfilled is sufficient but (if you choose the former latter) 
-a simple client-side UI updating the database would be preferred.
-
-Write a small unit test suite using any of the C# unit test frameworks demonstrating the
-functionality of the program and possible corner cases, full coverage is not needed.
 

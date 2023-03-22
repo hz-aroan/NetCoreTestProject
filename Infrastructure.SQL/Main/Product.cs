@@ -10,7 +10,7 @@ public partial class Product
 
     public string FeeCurrency { get; set; }
 
-    public decimal? FeeAmount { get; set; }
+    public decimal FeeAmount { get; set; }
 
     public virtual ICollection<BasketItem> BasketItems { get; } = new List<BasketItem>();
 }
