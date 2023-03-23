@@ -52,7 +52,7 @@ public class BasketController: Controller
 
 
 
-    [HttpPut("GetBasketQry")]
+    [HttpGet("GetBasketQry")]
     [SwaggerOperation(
         Summary = "Queries a basket content",
         OperationId = "GetBasketQry")]
