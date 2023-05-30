@@ -1,34 +1,13 @@
 ﻿using Infrastructure.SQL.Main;
 
 using LIB.Domain.Contracts;
-using LIB.Domain.Exceptions;
 using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace LIB.Domain.Features.Products;
 
-public class AddProductCmd : ICommandArg
-{
-    internal readonly String Currency;
-
-    internal readonly Double FeeAmount;
-
-    internal readonly Boolean IsAvailable;
-
-    internal readonly String ProductName;
+public sealed record AddProductCmd(String ProductName, Double FeeAmount, String Currency, Boolean IsAvailable) : ICommandArg;
 
 
-
-    public AddProductCmd(String productName, Double feeAmount, String currency, Boolean isAvailable)
-    {
-        FeeAmount = feeAmount;
-        Currency = currency;
-        ProductName = productName;
-        IsAvailable = isAvailable;
-    }
-}
 
 public class AddProductCmdHandler : ICommandHandler<AddProductCmd>
 {
@@ -45,14 +24,14 @@ public class AddProductCmdHandler : ICommandHandler<AddProductCmd>
     }
 
 
-    public void Execute(AddProductCmd cmd)
+    public Task Handle(AddProductCmd request, CancellationToken cancellationToken)
     {
-        var product = new Product
+         var product = new Product
         {
-            Name = cmd.ProductName,
-            IsAvailable = cmd.IsAvailable,
-            FeeAmount = (Decimal)cmd.FeeAmount,
-            FeeCurrency = cmd.Currency
+            Name = request.ProductName,
+            IsAvailable = request.IsAvailable,
+            FeeAmount = (Decimal)request.FeeAmount,
+            FeeCurrency = request.Currency
         };
 
         var validator = new ProductValidatingService(CurrencyService);
@@ -61,5 +40,6 @@ public class AddProductCmdHandler : ICommandHandler<AddProductCmd>
         using var ctx = EFWrapper.GetContext();
         ctx.Products.Add(product);
         EFWrapper.SafeFinish(ctx, "An error happened adding the new product!");
-    }
+        return Task.CompletedTask;
+   }
 }

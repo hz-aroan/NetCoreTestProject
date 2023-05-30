@@ -1,5 +1,4 @@
 ﻿using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using LIB.Domain.Exceptions;
@@ -7,11 +6,11 @@ using LIB.Domain.Features.Baskets;
 using LIB.Domain.Services;
 using Web.Site.Areas.Site.Home.Models;
 using Web.Site.Areas.Site.Shared.Models;
-using static System.Net.Mime.MediaTypeNames;
 using Web.Site.Areas.Site.Shopping.Models;
 using Microsoft.AspNetCore.Http;
 using LIB.Domain.Features.Products;
 using LIB.Domain.Services.DTO;
+using LIB.Domain.Contracts;
 
 namespace Web.Site.Areas.Site.Shopping;
 
@@ -42,7 +41,7 @@ public class ShoppingFactory
 
         var result = new IndexViewModel {
             SelectedEvent = session.SelectedEvent,
-            Basket = Dispatcher.Query(new GetBasketQry(session.SelectedBasketUid))
+            Basket = Dispatcher.Send(new GetBasketQry(session.SelectedBasketUid)).Result
         };
         return result;
     }
@@ -51,7 +50,7 @@ public class ShoppingFactory
 
     public void SelectEvent(Int32 eventId)
     {
-        var ev = Dispatcher.Query(new GetAvailableEventQry(eventId));
+        var ev = Dispatcher.Send(new GetAvailableEventQry(eventId)).Result;
 
         var sessionData = LoadSession();
         if (sessionData.SelectedEventId == ev.EventId)
@@ -60,7 +59,7 @@ public class ShoppingFactory
         if (sessionData.AlreadySelectedAnEvent)
             throw new DomainException("You have already selected an event to attend. Please finish shopping before selecting a new one!");
 
-        var cartUid = Dispatcher.Query(new CreateBasketCmd(ev.EventId));
+        var cartUid = Dispatcher.Send(new CreateBasketCmd(ev.EventId)).Result;
 
         sessionData.SelectedEvent = ev;
         sessionData.SelectedBasketUid = cartUid;
@@ -75,7 +74,7 @@ public class ShoppingFactory
         var session = LoadSession();
         if (session.AlreadySelectedAnEvent == false)
             return false;
-        Dispatcher.Execute(new AddProductToBasketCmd(session.SelectedBasketUid, productId, qty));
+        Dispatcher.Send(new AddProductToBasketCmd(session.SelectedBasketUid, productId, qty));
         return true;
     }
 
@@ -85,7 +84,7 @@ public class ShoppingFactory
     {
         var session = LoadSession();
         var result = new ProductListViewModel {
-            Products = Dispatcher.Query(new GetAllAvailableProductsQry())
+            Products = Dispatcher.Send(new GetAllAvailableProductsQry()).Result
         };
         return result;
     }
@@ -107,7 +106,7 @@ public class ShoppingFactory
     private SessionData LoadSession()
     {
         var session = Parent.HttpContext.Session.GetString(SessionData.SESSION_KEY_NAME);
-        var result = string.IsNullOrEmpty(session) ? new SessionData() : JsonSerializer.Deserialize<SessionData>(session);
+        var result = String.IsNullOrEmpty(session) ? new SessionData() : JsonSerializer.Deserialize<SessionData>(session);
         return result;
     }
 }

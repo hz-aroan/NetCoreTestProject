@@ -1,29 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.SQL.Main;
-using LIB.Domain.Contracts;
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Exceptions;
-using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
-using Microsoft.EntityFrameworkCore;
-using Event = LIB.Domain.Services.DTO.Event;
+using LIB.Domain.Services.DTO;
 
 namespace LIB.Domain.Features.Events;
 
-public class GetAvailableEventQry : IQueryRequest<Event>
-{
-    internal readonly Int32 EventId;
+public sealed record GetAvailableEventQry(Int32 EventId) : IQueryRequest<Event>;
 
 
-
-    public GetAvailableEventQry(Int32 eventId)
-    {
-        EventId = eventId;
-    }
-}
 
 public class GetAvailableEventQryHandler : IQueryHandler<GetAvailableEventQry, Event>
 {
@@ -39,10 +22,9 @@ public class GetAvailableEventQryHandler : IQueryHandler<GetAvailableEventQry, E
         CurrencyService = currencyService;
     }
 
-    
 
 
-    public Event Execute(GetAvailableEventQry queryArg)
+    public async Task<Event> Handle(GetAvailableEventQry queryArg, CancellationToken cancellationToken)
     {
         using var ctx = EFWrapper.GetContext();
 

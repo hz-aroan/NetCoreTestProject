@@ -1,12 +1,11 @@
 using Infrastructure.SQL.Main;
-using Microsoft.OpenApi.Models;
-using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 using LIB.Domain.Contracts;
 using LIB.Domain.Services;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +16,13 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true);
 var mainConnectionString = builder.Configuration.GetConnectionString("MainDatabase");
 builder.Services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
-builder.Services.AddScoped<IDispatcher, LIB.Domain.Services.CQ.Dispatcher>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(LIB.Domain.AssemblyReference.Assembly));
+
+
 builder.Services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
 builder.Services.AddScoped<IEFWrapper, EFWrapper>();
 builder.Services.AddScoped<IBasketHandlingService, BasketHandlingService>();
-CqAutoRegister.BuildCqTypes(builder.Services,typeof(GetAllAvailableEventsQry).Assembly);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

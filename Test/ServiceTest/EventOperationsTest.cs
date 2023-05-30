@@ -1,19 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LIB.Domain.Services;
-using Infrastructure.SQL.Main;
-using LIB.Domain.Services.DTO;
-using Microsoft.EntityFrameworkCore;
-using System.Collections;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using LIB.Domain.Exceptions;
+﻿using LIB.Domain.Exceptions;
 using LIB.Domain.Features.Events;
-using LIB.Domain.Features.Baskets;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using System.Linq;
 
 namespace Test.DomainTest;
 
@@ -30,14 +21,14 @@ public class EventOperationsTest : RepoTestBase
     [TestMethod]
     public void AddEvent_GoodEvent_EventIsStored()
     {
-        SuccessExpected(() =>
+        SuccessExpected(async () =>
         {
             ClearDatabase();
 
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            await Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
 
             
-            var allEvents = Dispatcher.Query(new GetAllAvailableEventsQry());
+            var allEvents = Dispatcher.Send(new GetAllAvailableEventsQry()).Result;
             var newEvent = allEvents.FirstOrDefault(p => p.Name == "first");
 
             Assert.IsNotNull(newEvent);
@@ -57,7 +48,7 @@ public class EventOperationsTest : RepoTestBase
         {
             ClearDatabase();
 
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", -3, "eur", true));
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", -3, "eur", true));
         });
     }
 
@@ -67,13 +58,13 @@ public class EventOperationsTest : RepoTestBase
     [TestMethod]
     public void GetAllAvailableEventsQry_Set_QueryExecutes()
     {
-        SuccessExpected(() =>
+        SuccessExpected( async () =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
-            Dispatcher.Execute(new AddEventCmd("second", "2nd descr", 20, "usd", false));
+            await Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            await Dispatcher.Send(new AddEventCmd("second", "2nd descr", 20, "usd", false));
 
-            var items = Dispatcher.Query(new GetAllAvailableEventsQry());
+            var items = await Dispatcher.Send(new GetAllAvailableEventsQry());
 
             Assert.AreEqual(1, items.Count );
         });

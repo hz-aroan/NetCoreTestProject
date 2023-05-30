@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.SQL.Main;
+﻿using LIB.Domain.Contracts;
+using LIB.Domain.Services.DTO;
 
-using LIB.Domain.Contracts;
-using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
 using Microsoft.EntityFrameworkCore;
 
 namespace LIB.Domain.Features.Events;
 
-public class GetAllAvailableEventsQry : IQueryRequest<IList<Services.DTO.Event>>
-{
-}
+public sealed record GetAllAvailableEventsQry : IQueryRequest<IList<Services.DTO.Event>>;
+
+
 
 public class GetEventsAvailableQryHandler : IQueryHandler<GetAllAvailableEventsQry, IList<Services.DTO.Event>>
 {
@@ -31,8 +24,7 @@ public class GetEventsAvailableQryHandler : IQueryHandler<GetAllAvailableEventsQ
     }
 
 
-
-    public IList<Services.DTO.Event> Execute(GetAllAvailableEventsQry queryArg)
+    public async Task<IList<Event>> Handle(GetAllAvailableEventsQry request, CancellationToken cancellationToken)
     {
         using var ctx = EFWrapper.GetContext();
         var rawEvents = ctx.Events

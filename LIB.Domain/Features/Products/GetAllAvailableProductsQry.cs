@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.SQL.Main;
-using LIB.Domain.Contracts;
-using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Services.DTO;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace LIB.Domain.Features.Products;
 
-public class GetAllAvailableProductsQry : IQueryRequest<IList<Services.DTO.Product>>
-{
-}
+public sealed record GetAllAvailableProductsQry : IQueryRequest<IList<Services.DTO.Product>>;
+
+
+
 
 public class GetAllAvailableProductsQryHandler : IQueryHandler<GetAllAvailableProductsQry, IList<Services.DTO.Product>>
 {
@@ -32,7 +26,7 @@ public class GetAllAvailableProductsQryHandler : IQueryHandler<GetAllAvailablePr
 
 
 
-    public IList<Services.DTO.Product> Execute(GetAllAvailableProductsQry queryArg)
+    public async Task<IList<Product>> Handle(GetAllAvailableProductsQry request, CancellationToken cancellationToken)
     {
         using var ctx = EFWrapper.GetContext();
         var rawEvents = ctx.Products.IgnoreAutoIncludes()
@@ -44,10 +38,10 @@ public class GetAllAvailableProductsQryHandler : IQueryHandler<GetAllAvailablePr
 
 
 
-    private Services.DTO.Product CreateProduct(Infrastructure.SQL.Main.Product p)
+    private Product CreateProduct(Infrastructure.SQL.Main.Product p)
     {
         var sign = CurrencyService.GetSing(p.FeeCurrency);
-        var result = new Services.DTO.Product(p, sign);
+        var result = new Product(p, sign);
         return result;
     }
 }

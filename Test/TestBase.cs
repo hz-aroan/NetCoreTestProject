@@ -1,27 +1,24 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Infrastructure.SQL.Main;
 
-using System;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
-using LIB.Domain.Services.CQ;
-using Microsoft.Extensions.Hosting;
-using Infrastructure.SQL.Main;
+using LIB.Domain.Contracts;
+
+using MediatR;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using System;
 using System.Text.RegularExpressions;
-using LIB.Domain.Contracts;
 
 namespace Test;
 
 public class RepoTestBase
 {
     public ILogger Log;
-    protected IDispatcher Dispatcher;
+    protected ISender Dispatcher;
     internal IHost? Host;
     internal IDbContextFactory<MainDbContext> DbctxFactory;
 
@@ -33,7 +30,7 @@ public class RepoTestBase
         Host = TestHostConfiguration.Configure();
         DbctxFactory = Host.Services.GetRequiredService<IDbContextFactory<MainDbContext>>();
         Log = Host.Services.GetService<ILogger<RepoTestBase>>();
-        Dispatcher = Host.Services.GetService<IDispatcher>();
+        Dispatcher = Host.Services.GetService<ISender>();
         CurrencyHandlingService = Host.Services.GetService<ICurrencyHandlingService>();
     }
 

@@ -36,11 +36,11 @@ public class BasketOperationsTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 0, "eur", true));
-            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", 0, "eur", true));
+            var anEvent = Dispatcher.Send(new GetAllAvailableEventsQry()).Result.First();
 
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
-            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(anEvent.EventId)).Result;
+            var basket = Dispatcher.Send(new GetBasketQry(basketUid)).Result;
 
             Assert.IsFalse(basket.Products.Any());
 
@@ -60,11 +60,11 @@ public class BasketOperationsTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
-            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            var anEvent = Dispatcher.Send(new GetAllAvailableEventsQry()).Result.First();
 
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
-            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(anEvent.EventId)).Result;
+            var basket = Dispatcher.Send(new GetBasketQry(basketUid)).Result;
 
             Assert.IsFalse(basket.Products.Any());
 
@@ -84,17 +84,17 @@ public class BasketOperationsTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 1", 1, "usd", true));
-            Dispatcher.Execute(new AddProductCmd("product 2", 2, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 3", 3, "usd", true));
-            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
-            var products = Dispatcher.Query(new GetAllAvailableProductsQry());
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 1", 1, "usd", true));
+            Dispatcher.Send(new AddProductCmd("product 2", 2, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 3", 3, "usd", true));
+            var anEvent = Dispatcher.Send(new GetAllAvailableEventsQry()).Result.First();
+            var products = Dispatcher.Send(new GetAllAvailableProductsQry()).Result;
             var productA = products.First();
 
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, 2));
-            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(anEvent.EventId)).Result;
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, 2));
+            var basket = Dispatcher.Send(new GetBasketQry(basketUid)).Result;
 
             Assert.IsTrue(basket.Products.Any());
             Assert.AreEqual(1, basket.Products.Count);
@@ -120,21 +120,21 @@ public class BasketOperationsTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 1", 1, "usd", true));
-            Dispatcher.Execute(new AddProductCmd("product 2", 2, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 3", 3, "usd", true));
-            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
-            var products = Dispatcher.Query(new GetAllAvailableProductsQry());
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 1", 1, "usd", true));
+            Dispatcher.Send(new AddProductCmd("product 2", 2, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 3", 3, "usd", true));
+            var anEvent = Dispatcher.Send(new GetAllAvailableEventsQry()).Result.First();
+            var products = Dispatcher.Send(new GetAllAvailableProductsQry()).Result;
             var productA = products.First();
             var productB = products.Skip(1).First();
 
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, 2));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productB.ProductId, 3));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
-            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(anEvent.EventId)).Result;
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, 2));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productB.ProductId, 3));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
+            var basket = Dispatcher.Send(new GetBasketQry(basketUid)).Result;
 
             Assert.IsTrue(basket.Products.Any());
             Assert.AreEqual(1, basket.Products.Count);
@@ -158,21 +158,21 @@ public class BasketOperationsTest : RepoTestBase
         SuccessExpected(() =>
         {
             ClearDatabase();
-            Dispatcher.Execute(new AddEventCmd("first", "1st descr", 10, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 1", 1, "usd", true));
-            Dispatcher.Execute(new AddProductCmd("product 2", 2, "eur", true));
-            Dispatcher.Execute(new AddProductCmd("product 3", 3, "usd", true));
-            var anEvent = Dispatcher.Query(new GetAllAvailableEventsQry()).First();
-            var products = Dispatcher.Query(new GetAllAvailableProductsQry());
+            Dispatcher.Send(new AddEventCmd("first", "1st descr", 10, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 1", 1, "usd", true));
+            Dispatcher.Send(new AddProductCmd("product 2", 2, "eur", true));
+            Dispatcher.Send(new AddProductCmd("product 3", 3, "usd", true));
+            var anEvent = Dispatcher.Send(new GetAllAvailableEventsQry()).Result.First();
+            var products = Dispatcher.Send(new GetAllAvailableProductsQry()).Result;
             var productA = products.First();
             var productB = products.Skip(1).First();
 
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(anEvent.EventId));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, 1));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productB.ProductId, 3));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productB.ProductId, -4));
-            var basket = Dispatcher.Query(new GetBasketQry(basketUid));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(anEvent.EventId)).Result;
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, 1));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productB.ProductId, 3));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productA.ProductId, -1));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productB.ProductId, -4));
+            var basket = Dispatcher.Send(new GetBasketQry(basketUid)).Result;
 
             Assert.IsFalse(basket.Products.Any());
             Assert.AreEqual(1, basket.Payments.Count);

@@ -1,6 +1,5 @@
-﻿using Azure;
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Features.Baskets;
-using LIB.Domain.Services.CQ;
 using LIB.Domain.Services.DTO;
 
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +44,7 @@ public class BasketController: Controller
     {
         return Safe.Execute(() =>
         {
-            Dispatcher.Execute(new AddProductToBasketCmd(basketUid, productId, quantity));
+            Dispatcher.Send(new AddProductToBasketCmd(basketUid, productId, quantity));
             return Ok();
         });
     }
@@ -63,7 +62,7 @@ public class BasketController: Controller
     {
         return Safe.Execute(() =>
         {
-            var result = Dispatcher.Query(new GetBasketQry(basketUid));
+            var result = Dispatcher.Send(new GetBasketQry(basketUid));
             return Ok(Json(result));
         });
     }

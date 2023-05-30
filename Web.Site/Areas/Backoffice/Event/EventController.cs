@@ -1,5 +1,7 @@
-﻿using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Web.Site.Areas.Backoffice.Event.Models;
 
 namespace Web.Site.Areas.Backoffice.Event;
@@ -18,9 +20,9 @@ public class EventController : Controller
 
 
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = Factory.GetIndexModel();
+        var model = await Factory.GetIndexModel();
         return View("Index", model);
     }
 

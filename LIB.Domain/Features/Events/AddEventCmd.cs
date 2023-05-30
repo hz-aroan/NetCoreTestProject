@@ -1,41 +1,13 @@
 ﻿using Infrastructure.SQL.Main;
-using LIB.Domain.Services.CQ;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using LIB.Domain.Exceptions;
-using LIB.Domain.Services;
+
 using LIB.Domain.Contracts;
+using LIB.Domain.Services;
 
 namespace LIB.Domain.Features.Events;
 
-public class AddEventCmd : ICommandArg
-{
-    internal readonly String Currency;
-
-    internal readonly String Description;
-
-    internal readonly String EventName;
-
-    internal readonly Double FeeAmount;
-
-    internal readonly Boolean IsAvailable;
+public sealed record AddEventCmd(String EventName, String Description, Double FeeAmount, String Currency, Boolean IsAvailable) : ICommandArg;
 
 
-
-    public AddEventCmd(String eventName, String description, Double feeAmount, String currency, Boolean isAvailable)
-    {
-        FeeAmount = feeAmount;
-        Currency = currency;
-        EventName = eventName;
-        Description = description;
-        IsAvailable = isAvailable;
-    }
-}
 
 public class AddEventCmdHandler : ICommandHandler<AddEventCmd>
 {
@@ -51,8 +23,7 @@ public class AddEventCmdHandler : ICommandHandler<AddEventCmd>
     }
 
 
-
-    public void Execute(AddEventCmd cmd)
+    public Task Handle(AddEventCmd cmd, CancellationToken cancellationToken)
     {
         using var ctx = EFWrapper.GetContext();
         var ev = new Event {
@@ -68,5 +39,6 @@ public class AddEventCmdHandler : ICommandHandler<AddEventCmd>
 
         ctx.Events.Add(ev);
         EFWrapper.SafeFinish(ctx, "An error happened adding the new event!");
+        return Task.CompletedTask;
     }
 }

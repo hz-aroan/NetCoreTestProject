@@ -1,7 +1,9 @@
-﻿using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
+using LIB.Domain.Features.Events;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
 using Web.Site.Areas.Backoffice.Event.Models;
 
 namespace Web.Site.Areas.Backoffice.Event;
@@ -25,10 +27,11 @@ public class EventFactory
 
 
 
-    public EventSelectionViewModel GetIndexModel()
+    public async Task<EventSelectionViewModel> GetIndexModel()
     {
-        var result = new EventSelectionViewModel {
-            Events = Dispatcher.Query(new GetAllAvailableEventsQry())
+        var result = new EventSelectionViewModel
+        {
+            Events = await Dispatcher.Send(new GetAllAvailableEventsQry())
         };
         return result;
     }
@@ -37,12 +40,11 @@ public class EventFactory
 
     public AddEventViewModel GetAddEventModel()
     {
-        var availableCurrencies = Dispatcher.Query(new GetAvailableCurrenciesQry());
-        var result = new AddEventViewModel {
-            Currencies = availableCurrencies.Select(p => new SelectListItem { Value = p.Id, Text = p.Text })
-                .ToList(),
-            Currency = availableCurrencies.First()
-                .Id
+        var availableCurrencies = Dispatcher.Send(new GetAvailableCurrenciesQry()).Result;
+        var result = new AddEventViewModel
+        {
+            Currencies = availableCurrencies.Select(p => new SelectListItem { Value = p.Id, Text = p.Text }).ToList(),
+            Currency = availableCurrencies.First().Id
         };
         return result;
     }
@@ -51,7 +53,7 @@ public class EventFactory
 
     public Boolean ProcessAddEvent(EventForm form)
     {
-        Dispatcher.Execute(new AddEventCmd(form.EventName, form.Description, form.FeeAmount, form.Currency, true));
+        Dispatcher.Send(new AddEventCmd(form.EventName, form.Description, form.FeeAmount, form.Currency, true));
         return true;
     }
 }

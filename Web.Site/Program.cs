@@ -1,14 +1,11 @@
 using Infrastructure.SQL.Main;
 
+using LIB.Domain.Contracts;
 using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
+using LIB.Domain.Services;
 
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
-
-using System.Reflection;
-using LIB.Domain.Contracts;
-using LIB.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +17,10 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true);
 var mainConnectionString = builder.Configuration.GetConnectionString("MainDatabase");
 builder.Services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
-builder.Services.AddScoped<IDispatcher, Dispatcher>();
+builder.Services.AddMediatR( cfg => cfg.RegisterServicesFromAssembly(LIB.Domain.AssemblyReference.Assembly));
 builder.Services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
 builder.Services.AddScoped<IEFWrapper, EFWrapper>();
 builder.Services.AddScoped<IBasketHandlingService, BasketHandlingService>();
-CqAutoRegister.BuildCqTypes(builder.Services,typeof(GetAllAvailableEventsQry).Assembly);
 
 builder.Services.Configure<RazorViewEngineOptions>(options =>
 {

@@ -1,4 +1,5 @@
-﻿using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Site.Areas.Site.Home;

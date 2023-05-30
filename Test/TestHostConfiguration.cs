@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Infrastructure.SQL.Main;
+﻿using Infrastructure.SQL.Main;
 
 using LIB.Domain.Contracts;
 using LIB.Domain.Features.Events;
 using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+
+using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace Test;
 
@@ -38,11 +32,10 @@ internal class TestHostConfiguration
                 var mainConnectionString = ResolveConnectionStringPattern(connectionsStringPattern);
                 services.AddPooledDbContextFactory<MainDbContext>(options => options.UseSqlServer(mainConnectionString));
 
-                services.AddScoped<IDispatcher, Dispatcher>();
+                services.AddMediatR( cfg => cfg.RegisterServicesFromAssembly(LIB.Domain.AssemblyReference.Assembly));
                 services.AddSingleton<ICurrencyHandlingService, CurrencyHandlingService>();
                 services.AddScoped<IEFWrapper, EFWrapper>();
                 services.AddScoped<IBasketHandlingService, BasketHandlingService>();
-                CqAutoRegister.BuildCqTypes(services,typeof(GetAllAvailableEventsQry).Assembly);
 
                 configureServicesCallback?.Invoke(ctx, services);
             })

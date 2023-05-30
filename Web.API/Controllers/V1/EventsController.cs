@@ -1,9 +1,6 @@
-﻿using System.Security.Cryptography;
-using Azure;
-
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Features.Baskets;
 using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
 using LIB.Domain.Services.DTO;
 
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +45,7 @@ public class EventsController : Controller
     {
         return Safe.Execute(() =>
         {
-            Dispatcher.Execute(new AddEventCmd(eventName, description, feeAmount, currency, true));
+            Dispatcher.Send(new AddEventCmd(eventName, description, feeAmount, currency, true));
             return Ok();
         });
     }
@@ -66,7 +63,7 @@ public class EventsController : Controller
     {
         return Safe.Execute(() =>
         {
-            var availableEvents = Dispatcher.Query(new GetAllAvailableEventsQry());
+            var availableEvents = Dispatcher.Send(new GetAllAvailableEventsQry());
             return Ok(Json(availableEvents));
         });
     }
@@ -85,7 +82,7 @@ public class EventsController : Controller
     {
         return Safe.Execute(() =>
         {
-            var basketUid = Dispatcher.Query(new CreateBasketCmd(eventId));
+            var basketUid = Dispatcher.Send(new CreateBasketCmd(eventId));
             return Ok(Json(basketUid));
         });
     }

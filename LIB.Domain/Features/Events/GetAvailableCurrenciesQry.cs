@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using LIB.Domain.Contracts;
-using LIB.Domain.Services;
-using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Services.DTO;
 
 namespace LIB.Domain.Features.Events;
 
-public class GetAvailableCurrenciesQry : IQueryRequest<IList<Currency>>
-{
-}
+public sealed record GetAvailableCurrenciesQry : IQueryRequest<IList<Currency>>;
+
+
 
 public class GetAvailableCurrenciesQryHandler : IQueryHandler<GetAvailableCurrenciesQry, IList<Currency>>
 {
@@ -27,7 +19,7 @@ public class GetAvailableCurrenciesQryHandler : IQueryHandler<GetAvailableCurren
 
 
 
-    public IList<Currency> Execute(GetAvailableCurrenciesQry request)
+    public async Task<IList<Currency>> Handle(GetAvailableCurrenciesQry request, CancellationToken cancellationToken)
     {
         return CurrencyService.GetCurrencies();
     }

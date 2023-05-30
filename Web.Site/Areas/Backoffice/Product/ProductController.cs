@@ -1,5 +1,7 @@
-﻿using LIB.Domain.Services.CQ;
+﻿using LIB.Domain.Contracts;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Web.Site.Areas.Backoffice.Event;
 using Web.Site.Areas.Backoffice.Product.Models;
 
@@ -36,9 +38,9 @@ public class ProductController : Controller
 
 
     [HttpPost]
-    public IActionResult DoAddProduct(ProductForm form)
+    public async Task<IActionResult> DoAddProduct(ProductForm form)
     {
-        var model = Factory.ProcessAddProduct(form);
+        var model = await Factory.ProcessAddProduct(form);
         return Redirect("Index");
     }
 }

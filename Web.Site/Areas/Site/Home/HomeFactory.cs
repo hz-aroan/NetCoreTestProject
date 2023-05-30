@@ -1,7 +1,8 @@
-﻿using LIB.Domain.Features.Events;
-using LIB.Domain.Services.CQ;
-using Microsoft.AspNetCore.Components;
+﻿using LIB.Domain.Contracts;
+using LIB.Domain.Features.Events;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Web.Site.Areas.Site.Home.Models;
 
 namespace Web.Site.Areas.Site.Home;
@@ -28,7 +29,7 @@ public class HomeFactory
     public EventSelectionViewModel GetIndexModel()
     {
         return new EventSelectionViewModel {
-            Events = Dispatcher.Query(new GetAllAvailableEventsQry())
+            Events = Dispatcher.Send(new GetAllAvailableEventsQry()).Result
         };
     }
 }

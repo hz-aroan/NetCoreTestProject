@@ -1,10 +1,5 @@
-﻿using System.Security.Cryptography;
-using Azure;
-
-using LIB.Domain.Features.Baskets;
-using LIB.Domain.Features.Events;
+﻿using LIB.Domain.Contracts;
 using LIB.Domain.Features.Products;
-using LIB.Domain.Services.CQ;
 using LIB.Domain.Services.DTO;
 
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +43,7 @@ public class ProductsController : Controller
     {
         return Safe.Execute(() =>
         {
-            var products = Dispatcher.Query(new GetAllAvailableProductsQry());
+            var products = Dispatcher.Send(new GetAllAvailableProductsQry());
             return Ok(Json(products));
         });
     }
@@ -67,7 +62,7 @@ public class ProductsController : Controller
     {
         return Safe.Execute(() =>
         {
-            Dispatcher.Execute(new AddProductCmd(productName, feeAmount, currencyId, true));
+            Dispatcher.Send(new AddProductCmd(productName, feeAmount, currencyId, true));
             return Ok();
         });
     }
